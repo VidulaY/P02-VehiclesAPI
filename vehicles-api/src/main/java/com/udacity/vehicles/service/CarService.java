@@ -2,9 +2,12 @@ package com.udacity.vehicles.service;
 
 import com.udacity.vehicles.client.maps.MapsClient;
 import com.udacity.vehicles.client.prices.PriceClient;
+import com.udacity.vehicles.domain.Location;
 import com.udacity.vehicles.domain.car.Car;
 import com.udacity.vehicles.domain.car.CarRepository;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -49,6 +52,12 @@ public class CarService {
          *   Remove the below code as part of your implementation.
          */
         Car car = new Car();
+        Optional<Car> optionalCar = repository.findById(id);
+        if(!optionalCar.isPresent()){
+            throw new CarNotFoundException();
+        } else {
+            car = (Car) optionalCar.get();
+        }
 
         /**
          * TODO: Use the Pricing Web client you create in `VehiclesApiApplication`
@@ -68,7 +77,8 @@ public class CarService {
          * Note: The Location class file also uses @transient for the address,
          * meaning the Maps service needs to be called each time for the address.
          */
-
+        Location location = car.getLocation();
+        car.setLocation(mapsClient.getAddress(location));
 
         return car;
     }
@@ -100,12 +110,17 @@ public class CarService {
          * TODO: Find the car by ID from the `repository` if it exists.
          *   If it does not exist, throw a CarNotFoundException
          */
-
+        Car car = new Car();
+        Optional<Car> optionalCar = repository.findById(id);
+        if(!optionalCar.isPresent()){
+            throw new CarNotFoundException();
+        } else {
+            car = (Car) optionalCar.get();
+        }
 
         /**
          * TODO: Delete the car from the repository.
          */
-
-
+        repository.delete(car);
     }
 }
